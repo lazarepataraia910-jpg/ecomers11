@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { NotebookPen } from 'lucide-react'
+import { usingSupabase } from '../services'
 
 export function AuthenticationLayout({ title, subtitle, children, footer }: { title: string; subtitle: string; children: ReactNode; footer: ReactNode }) {
   return (
@@ -10,6 +11,11 @@ export function AuthenticationLayout({ title, subtitle, children, footer }: { ti
         </div>
         <h1 className="mt-4 text-center text-2xl font-semibold">{title}</h1>
         <p className="mt-2 text-center text-sm text-n-600">{subtitle}</p>
+        {!usingSupabase && (
+          <p className="mt-4 rounded-lg bg-n-100 p-3 text-center text-xs text-n-600">
+            Demo mode: accounts and notes are stored only in this browser.
+          </p>
+        )}
         <div className="mt-6">{children}</div>
         <p className="mt-6 border-t border-n-200 pt-6 text-center text-sm text-n-600">{footer}</p>
       </div>

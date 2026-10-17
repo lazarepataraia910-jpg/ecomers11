@@ -13,7 +13,7 @@ export const supabaseAuth: AuthService = {
     return data.session ? toUser(data.session.user) : null
   },
   async signUp(email, password) {
-    const { data, error } = await supabase!.auth.signUp({ email: email.trim(), password })
+    const { data, error } = await supabase!.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: window.location.origin + '/login' } })
     if (error) throw new Error(error.message)
     // With email confirmation enabled there is no session yet: do not pretend the user is signed in.
     if (!data.session || !data.user) throw new Error('Account created. Check your email to confirm it, then log in.')

@@ -19,3 +19,11 @@ npm run build
 
 ## Features
 Register/login with validation and show/hide password, create/edit/delete (with confirmation) notes, debounced autosave with save status and unload warning, search by title and content, sort by updated/created, archive, tags, empty/search-empty/loading/error states, responsive drawer sidebar and list/editor switching on mobile.
+
+## Deploy on Vercel with Supabase (persistent users and notes)
+1. Create a project at supabase.com and run `supabase/schema.sql` in the SQL editor.
+2. In Supabase → Project Settings → API copy the Project URL and the `anon public` key (never the `service_role` key).
+3. In Vercel → Project → Settings → Environment Variables add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, then redeploy (Vite bakes them in at build time).
+4. In Supabase → Authentication → URL Configuration add your Vercel URL to the allowed redirect URLs. For quick testing you can disable "Confirm email" under Providers → Email.
+
+`vercel.json` rewrites all paths to `index.html` so client routes like `/login` work.
