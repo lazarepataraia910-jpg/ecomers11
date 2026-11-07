@@ -72,7 +72,7 @@ export default function DashboardPage() {
     <div className="flex h-screen bg-white">
       <Sidebar view={view} tags={tags} open={menuOpen} onClose={() => setMenuOpen(false)} onSelect={(v) => { setView(v); nav('/notes') }} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <Header title={title} search={search} onSearch={setSearch} onMenu={() => setMenuOpen(true)} email={user!.email}
+        <Header title={title} search={search} onSearch={setSearch} onMenu={() => setMenuOpen(true)} email={user!.email} isAdmin={user!.isAdmin}
           onSignOut={async () => { await signOut(); nav('/login') }} />
         <div className="flex min-h-0 flex-1">
           <div key={viewKey(view)} className={`${noteId ? 'hidden' : 'block'} w-full shrink-0 border-r border-n-200 md:block md:w-72 lg:w-80`}>

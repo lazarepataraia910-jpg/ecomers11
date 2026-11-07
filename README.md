@@ -27,3 +27,9 @@ Register/login with validation and show/hide password, create/edit/delete (with 
 4. In Supabase → Authentication → URL Configuration add your Vercel URL to the allowed redirect URLs. For quick testing you can disable "Confirm email" under Providers → Email.
 
 `vercel.json` rewrites all paths to `index.html` so client routes like `/login` work.
+
+## Admin panel (`/admin`)
+Admins see user and note counts, every user with their note count, and every note (searchable by title, content or owner), and can delete any note. Admins cannot edit other people's notes or delete accounts. Admins get an "Admin" button in the header; everyone else is redirected from `/admin` to `/notes`.
+
+- **localStorage mode:** the first account registered in a browser is the admin (demo only).
+- **Supabase:** run `supabase/admin.sql` once. It adds the `admins` and `profiles` tables and lets admins read and delete all notes through Row Level Security. Then make yourself admin by running the last line of that file with your email. Admin rights live in the database, not in the frontend.

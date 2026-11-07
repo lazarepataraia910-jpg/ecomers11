@@ -1,4 +1,4 @@
-export interface User { id: string; email: string }
+export interface User { id: string; email: string; isAdmin?: boolean }
 export interface Note {
   id: string
   user_id: string
@@ -23,4 +23,13 @@ export interface NotesService {
   create(userId: string, input: NoteInput): Promise<Note>
   update(id: string, input: NoteInput): Promise<Note>
   remove(id: string): Promise<void>
+}
+
+export interface AdminUser { id: string; email: string; created_at: string; note_count: number }
+export interface AdminNote extends Note { owner_email: string }
+export interface AdminData { users: AdminUser[]; notes: AdminNote[] }
+/** Read-only overview plus note moderation. Real enforcement lives in the database policies. */
+export interface AdminService {
+  load(): Promise<AdminData>
+  deleteNote(id: string): Promise<void>
 }

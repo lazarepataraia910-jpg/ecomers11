@@ -1,4 +1,4 @@
-import type { AuthService, Note, NotesService, User } from '../lib/types'
+import type { AdminNote, AdminService, AuthService, Note, NotesService, User } from '../lib/types'
 
 // Temporary localStorage backend. Passwords are salted+hashed with WebCrypto,
 // but this is NOT secure authentication: use Supabase for real deployments.
@@ -16,19 +16,25 @@ async function hash(password: string, salt: string) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt + password))
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('')
 }
-interface StoredUser extends User { salt: string; hash: string }
+interface StoredUser { id: string; email: string; salt: string; hash: string; created_at?: string; isAdmin?: boolean }
+const toUser = (u: StoredUser): User => ({ id: u.id, email: u.email, isAdmin: !!u.isAdmin })
 
 export const localAuth: AuthService = {
-  async getSession() { return read<User | null>(SESSION, null) },
+  async getSession() {
+    const s = read<User | null>(SESSION, null)
+    const u = s && read<StoredUser[]>(USERS, []).find((x) => x.id === s.id)
+    return u ? toUser(u) : null
+  },
   async signUp(email, password) {
     await delay()
     const users = read<StoredUser[]>(USERS, [])
     const e = email.trim().toLowerCase()
     if (users.some((u) => u.email === e)) throw new Error('An account with this email already exists')
     const salt = crypto.randomUUID()
-    const u: StoredUser = { id: crypto.randomUUID(), email: e, salt, hash: await hash(password, salt) }
+    // Demo rule: the first account created in this browser is the admin.
+    const u: StoredUser = { id: crypto.randomUUID(), email: e, salt, hash: await hash(password, salt), created_at: new Date().toISOString(), isAdmin: users.length === 0 }
     write(USERS, [...users, u])
-    const user = { id: u.id, email: u.email }
+    const user = toUser(u)
     write(SESSION, user)
     return user
   },
@@ -37,7 +43,7 @@ export const localAuth: AuthService = {
     const e = email.trim().toLowerCase()
     const u = read<StoredUser[]>(USERS, []).find((x) => x.email === e)
     if (!u || u.hash !== (await hash(password, u.salt))) throw new Error('Invalid email or password')
-    const user = { id: u.id, email: u.email }
+    const user = toUser(u)
     write(SESSION, user)
     return user
   },
@@ -61,4 +67,18 @@ export const localNotes: NotesService = {
     return all[i]
   },
   async remove(id) { write(NOTES, read<Note[]>(NOTES, []).filter((n) => n.id !== id)) },
+}
+
+export const localAdmin: AdminService = {
+  async load() {
+    await delay()
+    const users = read<StoredUser[]>(USERS, [])
+    const notes = read<Note[]>(NOTES, [])
+    const email = (id: string) => users.find((u) => u.id === id)?.email ?? 'unknown'
+    return {
+      users: users.map((u) => ({ id: u.id, email: u.email, created_at: u.created_at ?? '', note_count: notes.filter((n) => n.user_id === u.id).length })),
+      notes: notes.map<AdminNote>((n) => ({ ...n, owner_email: email(n.user_id) })),
+    }
+  },
+  async deleteNote(id) { write(NOTES, read<Note[]>(NOTES, []).filter((n) => n.id !== id)) },
 }
