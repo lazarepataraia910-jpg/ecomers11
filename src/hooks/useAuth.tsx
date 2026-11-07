@@ -7,6 +7,7 @@ interface AuthCtx {
   loading: boolean
   signUp: (e: string, p: string) => Promise<void>
   signIn: (e: string, p: string) => Promise<void>
+  signInWithGoogle: (credential: string) => Promise<void>
   signOut: () => Promise<void>
 }
 const Ctx = createContext<AuthCtx | null>(null)
@@ -23,6 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user, loading,
     signUp: async (e, p) => setUser(await authService.signUp(e, p)),
     signIn: async (e, p) => setUser(await authService.signIn(e, p)),
+    signInWithGoogle: async (c) => setUser(await authService.signInWithGoogle(c)),
     signOut: async () => { await authService.signOut(); setUser(null) },
   }
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

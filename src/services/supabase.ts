@@ -29,6 +29,11 @@ export const supabaseAuth: AuthService = {
     if (error) throw new Error(error.message)
     return withAdminFlag(data.user)
   },
+  async signInWithGoogle(credential) {
+    const { data, error } = await supabase!.auth.signInWithIdToken({ provider: 'google', token: credential })
+    if (error) throw new Error(error.message)
+    return withAdminFlag(data.user)
+  },
   async signOut() { await supabase!.auth.signOut() },
 }
 

@@ -1,3 +1,4 @@
+import { parseGoogleCredential } from '../lib/google'
 import type { AdminNote, AdminService, AuthService, Note, NotesService, User } from '../lib/types'
 
 // Temporary localStorage backend. Passwords are salted+hashed with WebCrypto,
@@ -44,6 +45,19 @@ export const localAuth: AuthService = {
     const e = email.trim().toLowerCase()
     const u = read<StoredUser[]>(USERS, []).find((x) => x.email === e)
     if (!u || u.hash !== (await hash(password, u.salt))) throw new Error('Invalid email or password')
+    const user = toUser(u)
+    write(SESSION, user)
+    return user
+  },
+  async signInWithGoogle(credential) {
+    const { email } = parseGoogleCredential(credential)
+    const users = read<StoredUser[]>(USERS, [])
+    let u = users.find((x) => x.email === email)
+    if (!u) {
+      // Google-only account: empty hash means password login can never match it.
+      u = { id: crypto.randomUUID(), email, salt: '', hash: '', created_at: new Date().toISOString() }
+      write(USERS, [...users, u])
+    }
     const user = toUser(u)
     write(SESSION, user)
     return user

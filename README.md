@@ -36,3 +36,12 @@ Admins see user and note counts, every user with their note count, and every not
 
 - **localStorage mode:** the first account registered in a browser is the admin (demo only).
 - **Supabase:** run `supabase/admin.sql` once. It adds the `admins` and `profiles` tables and lets admins read and delete all notes through Row Level Security. Then make yourself admin by running the last line of that file with your email. Admin rights live in the database, not in the frontend.
+
+## Google login (optional)
+"Continue with Google" appears on the login and sign-up pages once `VITE_GOOGLE_CLIENT_ID` is set (add it to `.env.production` or Vercel's Environment Variables, then redeploy).
+
+1. Google Cloud Console → APIs & Services → Credentials → Create credentials → OAuth client ID → Web application.
+2. Authorized JavaScript origins: `https://ecomers11.vercel.app` (and `http://localhost:5173` for local development). No redirect URI is needed.
+3. Copy the Client ID (it ends with `.apps.googleusercontent.com`; it is public, not a secret). Never use the client secret here.
+
+In localStorage mode the Google token is only checked in the browser (issuer, audience, expiry, verified email), so it is demo-grade like the rest of that mode. With Supabase configured, the token is verified by Supabase (`signInWithIdToken`); enable the Google provider there with the same Client ID.

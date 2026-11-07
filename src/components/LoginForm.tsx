@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PasswordField, TextField } from './AuthFields'
 import { useAuth } from '../hooks/useAuth'
+import { GoogleSignIn } from './GoogleSignIn'
 import { validateEmail, validatePassword } from '../lib/validation'
 
 export function LoginForm() {
@@ -27,13 +28,16 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="space-y-4">
-      <TextField label="Email Address" type="email" autoComplete="email" value={email} onChange={setEmail}
-        onBlur={() => setTouched((t) => ({ ...t, email: true }))} error={show('email')} disabled={busy} />
-      <PasswordField label="Password" autoComplete="current-password" value={password} onChange={setPassword}
-        onBlur={() => setTouched((t) => ({ ...t, password: true }))} error={show('password')} disabled={busy} />
-      {formError && <p role="alert" className="text-sm text-danger">{formError}</p>}
-      <button type="submit" className="btn-primary w-full" disabled={busy}>{busy ? 'Logging in…' : 'Login'}</button>
-    </form>
+    <>
+      <form onSubmit={submit} noValidate className="space-y-4">
+        <TextField label="Email Address" type="email" autoComplete="email" value={email} onChange={setEmail}
+          onBlur={() => setTouched((t) => ({ ...t, email: true }))} error={show('email')} disabled={busy} />
+        <PasswordField label="Password" autoComplete="current-password" value={password} onChange={setPassword}
+          onBlur={() => setTouched((t) => ({ ...t, password: true }))} error={show('password')} disabled={busy} />
+        {formError && <p role="alert" className="text-sm text-danger">{formError}</p>}
+        <button type="submit" className="btn-primary w-full" disabled={busy}>{busy ? 'Logging in…' : 'Login'}</button>
+      </form>
+      <GoogleSignIn />
+    </>
   )
 }

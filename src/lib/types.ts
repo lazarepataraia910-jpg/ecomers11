@@ -16,6 +16,7 @@ export interface AuthService {
   getSession(): Promise<User | null>
   signUp(email: string, password: string): Promise<User>
   signIn(email: string, password: string): Promise<User>
+  signInWithGoogle(credential: string): Promise<User>
   signOut(): Promise<void>
 }
 export interface NotesService {
