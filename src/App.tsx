@@ -22,6 +22,13 @@ function AdminGate({ children }: { children: ReactElement }) {
   return children
 }
 
+// Visitors who are not signed in land on registration; signed-in users go to their notes.
+function Home() {
+  const { user, loading } = useAuth()
+  if (loading) return <p className="p-8 text-sm text-n-600">Loading…</p>
+  return <Navigate to={user ? '/notes' : '/register'} replace />
+}
+
 export default function App() {
   return (
     <Routes>
@@ -29,7 +36,7 @@ export default function App() {
       <Route path="/login" element={<Gate requireAuth={false}><LoginPage /></Gate>} />
       <Route path="/admin" element={<AdminGate><AdminPage /></AdminGate>} />
       <Route path="/notes/:noteId?" element={<Gate requireAuth><DashboardPage /></Gate>} />
-      <Route path="*" element={<Navigate to="/notes" replace />} />
+      <Route path="*" element={<Home />} />
     </Routes>
   )
 }

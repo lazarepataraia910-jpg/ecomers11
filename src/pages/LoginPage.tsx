@@ -7,6 +7,7 @@ export default function LoginPage() {
     <AuthenticationLayout title="Welcome to Notes" subtitle="Please log in to continue"
       footer={<>No account yet? <Link to="/register" className="font-medium text-n-950 underline">Sign Up</Link></>}>
       <LoginForm />
+      <Link to="/register" className="btn-secondary mt-3 w-full">Create an account</Link>
     </AuthenticationLayout>
   )
 }
