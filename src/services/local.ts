@@ -16,8 +16,10 @@ async function hash(password: string, salt: string) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt + password))
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('')
 }
-interface StoredUser { id: string; email: string; salt: string; hash: string; created_at?: string; isAdmin?: boolean }
-const toUser = (u: StoredUser): User => ({ id: u.id, email: u.email, isAdmin: !!u.isAdmin })
+interface StoredUser { id: string; email: string; salt: string; hash: string; created_at?: string }
+// Demo rule: the first account registered in this browser is the admin
+// (also covers accounts created before the admin panel existed).
+const toUser = (u: StoredUser): User => ({ id: u.id, email: u.email, isAdmin: read<StoredUser[]>(USERS, [])[0]?.id === u.id })
 
 export const localAuth: AuthService = {
   async getSession() {
@@ -31,8 +33,7 @@ export const localAuth: AuthService = {
     const e = email.trim().toLowerCase()
     if (users.some((u) => u.email === e)) throw new Error('An account with this email already exists')
     const salt = crypto.randomUUID()
-    // Demo rule: the first account created in this browser is the admin.
-    const u: StoredUser = { id: crypto.randomUUID(), email: e, salt, hash: await hash(password, salt), created_at: new Date().toISOString(), isAdmin: users.length === 0 }
+    const u: StoredUser = { id: crypto.randomUUID(), email: e, salt, hash: await hash(password, salt), created_at: new Date().toISOString() }
     write(USERS, [...users, u])
     const user = toUser(u)
     write(SESSION, user)
